@@ -26,7 +26,7 @@ class ResearchTask(Task):
         - Safety + travel tips
         - Top 10 places
         """
-        return {"summary": generate_text(prompt, max_output_tokens=700)}
+        return {"summary": generate_text(prompt)}
 
 class AttractionsTask(Task):
     def __init__(self):
@@ -38,7 +38,7 @@ class AttractionsTask(Task):
 
     def run(self, destination: str):
         prompt = f"List top 10 attractions in {destination} with one-line description."
-        return {"attractions": generate_text(prompt, max_output_tokens=600)}
+        return {"attractions": generate_text(prompt)}
 
 class HotelsTask(Task):
     def __init__(self):
@@ -63,7 +63,7 @@ class HotelsTask(Task):
             }
 
         prompt = f"List 7 good hotels in {destination}."
-        return {"hotels": generate_text(prompt, max_output_tokens=500)}
+        return {"hotels": generate_text(prompt)}
 
 class BudgetTask(Task):
     def __init__(self):
@@ -78,7 +78,7 @@ class BudgetTask(Task):
         Estimate budget for {days}-day trip from {origin} to {destination} by {travel_mode}.
         Include stay, food, travel, attractions and final total.
         """
-        return {"budget": generate_text(prompt, max_output_tokens=500)}
+        return {"budget": generate_text(prompt)}
 
 class ItineraryTask(Task):
     def __init__(self):
@@ -94,4 +94,4 @@ class ItineraryTask(Task):
         using these attractions: {attractions}.
         Include timing + details per day.
         """
-        return {"itinerary": generate_text(prompt, max_output_tokens=800)}
+        return {"itinerary": generate_text(prompt)}
