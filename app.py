@@ -1,7 +1,8 @@
-# app.py
+# app.py (Modified)
 import streamlit as st
 from crew.crew_config import build_crew
-from crew.tasks import ResearchTask, HotelsTask, AttractionsTask, BudgetTask, ItineraryTask
+# 1. NEW IMPORT: Add CuisineTask
+from crew.tasks import ResearchTask, HotelsTask, AttractionsTask, BudgetTask, ItineraryTask, CuisineTask
 
 st.set_page_config(page_title="AI Travel Planner", page_icon="🌍", layout="wide")
 
@@ -46,6 +47,13 @@ with st.form("form"):
         destination = st.text_input("🟨 Destination", "Goa")
         travel_mode = st.selectbox("🚗 Mode of Travel", ["car", "train", "flight"])
 
+    # 2. NEW INPUT: Travel Preference for personalization
+    travel_style = st.selectbox(
+        "✨ Travel Style Preference",
+        ["General Interest", "Relaxation (Beaches, Spas)", "Adventure (Hiking, Sports)", "Cultural (Museums, History)", "Foodie (Local Cuisine)"],
+        index=0 # Default to General Interest
+    )
+
     generate = st.form_submit_button("✨ Generate Complete Itinerary")
 
 # ---------- MAIN OUTPUT ----------
@@ -58,21 +66,26 @@ if generate:
     hotels_task = HotelsTask()
     budget_task = BudgetTask()
     itinerary_task = ItineraryTask()
+    # 3. NEW TASK INITIALIZATION
+    cuisine_task = CuisineTask()
 
     crew = build_crew([
         research_task,
         attractions_task,
         hotels_task,
         budget_task,
-        itinerary_task
+        itinerary_task,
+        cuisine_task # 4. ADD NEW TASK TO CREW
     ])
 
-    # Run tasks
+    # Run tasks - Adjusting calls to pass 'travel_style' and run 'cuisine_task'
+    # NOTE: You must update your Task classes in crew/tasks.py to accept and use these new arguments.
     research = research_task.run(destination)
-    attractions = attractions_task.run(destination)
-    hotels = hotels_task.run(destination)
-    budget = budget_task.run(origin, destination, days, travel_mode)
-    itinerary = itinerary_task.run(destination, days, attractions["attractions"])
+    attractions = attractions_task.run(destination, travel_style) # Pass style for filtering
+    hotels = hotels_task.run(destination, travel_style) # Pass style for personalized hotel tier
+    budget = budget_task.run(origin, destination, days, travel_mode, travel_style) # Pass style for better budget estimate
+    cuisine = cuisine_task.run(destination) # 5. RUN NEW TASK
+    itinerary = itinerary_task.run(destination, days, attractions["attractions"], travel_style, cuisine["recommendations"]) # Use all new info for final plan
 
     # ---------- OUTPUT SECTIONS ----------
     st.markdown("## 🌎 Destination Overview")
@@ -98,6 +111,10 @@ if generate:
 
     st.markdown("## 💸 Estimated Budget")
     st.markdown(f"<div class='card'>{budget['budget']}</div>", unsafe_allow_html=True)
+
+    # 6. NEW OUTPUT SECTION: Local Cuisine
+    st.markdown("## 🍲 Unique Local Tastes & Experiences")
+    st.markdown(f"<div class='card'>{cuisine['recommendations']}</div>", unsafe_allow_html=True)
 
     st.markdown("## 🗓 Day-by-Day Itinerary")
     st.markdown(f"<div class='card'>{itinerary['itinerary']}</div>", unsafe_allow_html=True)
