@@ -1,4 +1,5 @@
 # gemini_client.py
+
 import os
 from dotenv import load_dotenv
 from google import genai
@@ -11,9 +12,12 @@ if not API_KEY:
 
 client = genai.Client(api_key=API_KEY)
 
-def generate_text(prompt, max_output_tokens=512, model="models/gemini-pro-latest"):
-    response = client.models.generate_content(
-        model=model,
-        contents=[prompt]
-    )
-    return response.text
+def generate_text(prompt, model="gemini-2.0-flash"):
+    try:
+        response = client.models.generate_content(
+            model=model,
+            contents=prompt
+        )
+        return response.text
+    except Exception as e:
+        return f"❌ Gemini API Error: {str(e)}"
