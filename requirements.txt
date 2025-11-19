@@ -1,0 +1,8 @@
+streamlit
+crewai
+google-genai
+requests
+beautifulsoup4
+python-dotenv
+pydantic
+httpx
